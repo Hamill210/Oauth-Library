@@ -1,6 +1,5 @@
 package com.codesquad.oauthgithublibrary.oauth.github;
 
-import javafx.scene.effect.Bloom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
