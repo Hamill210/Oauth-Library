@@ -73,25 +73,17 @@ public class GitHubOauthServiceImpl implements GitHubOauthService {
 
     public void getUserData(HttpServletResponse response, String accessToken) {
         Token token = tokenRepository.findTokenObjectByAccessToken(accessToken);
-        logger.info("##### token1 : {}", token.getToken());
         try {
             RestTemplate restTemplate = new RestTemplate();
-            logger.info("##### token2 : {}", token.getToken());
 
             HttpHeaders header = new HttpHeaders();
-            logger.info("##### token 3: {}", token.getToken());
             HttpEntity<?> entity = new HttpEntity<>(header);
-            logger.info("##### token 4: {}", token.getToken());
 
             String githubOfficialUrl = "https://api.github.com/user";
-            logger.info("##### token 5: {}", token.getToken());
             UriComponents sendAceessTokenUrl = UriComponentsBuilder.fromHttpUrl(githubOfficialUrl + "?access_token=" + token.getToken()).build();
-            logger.info("##### token 6: {}", token.getToken());
 
             // 이 한줄의 코드로 API를 호출해 MAP 타입으로 전달 받는다
             ResponseEntity<Map> resultMap = restTemplate.exchange(sendAceessTokenUrl.toString(), HttpMethod.GET, entity, Map.class);
-            logger.info("##### token 7: {}", token.getToken());
-
 
             User user = new User(
                     null,
@@ -99,7 +91,6 @@ public class GitHubOauthServiceImpl implements GitHubOauthService {
                     resultMap.getBody().get("login").toString(),
                     resultMap.getBody().get("name").toString());
 
-            logger.info("##### token 8: {}", token.getToken());
             this.sendUserCookies(user, response);
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             logger.info("##### HttpErrorException: {}", e.getMessage());
@@ -110,7 +101,6 @@ public class GitHubOauthServiceImpl implements GitHubOauthService {
 
     public void sendUserCookies(User user, HttpServletResponse response) throws IOException {
         Cookie cookie = new Cookie("user", user.getName());
-        logger.info("cookie : {}", cookie);
         response.addCookie(cookie);
         response.sendRedirect(url);
     }
