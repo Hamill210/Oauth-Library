@@ -1,6 +1,3 @@
-DROP TABLE IF EXISTS token;
-
-
 CREATE TABLE token
 (
     id         BIGINT PRIMARY KEY AUTO_INCREMENT,
