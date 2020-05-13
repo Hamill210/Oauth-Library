@@ -89,7 +89,7 @@ public class GitHubOauthServiceImpl implements GitHubOauthService {
 
             User user = new User(
                     null,
-                    Objects.requireNonNull(resultMap.getBody()).get("id").toString(),
+                    resultMap.getBody().get("id").toString(),
                     resultMap.getBody().get("login").toString(),
                     resultMap.getBody().get("name").toString());
 
