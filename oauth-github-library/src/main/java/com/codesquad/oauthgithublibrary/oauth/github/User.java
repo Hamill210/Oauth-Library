@@ -7,13 +7,17 @@ public class User {
     @Id
     private Long id;
     private String githubId;
-    private String login;
+    private String nickname;
     private String name;
 
-    public User(Long id, String githubId, String login, String name) {
+    public User() {
+
+    }
+
+    public User(Long id, String githubId, String nickname, String name) {
         this.id = id;
         this.githubId = githubId;
-        this.login = login;
+        this.nickname = nickname;
         this.name = name;
     }
 
@@ -25,16 +29,20 @@ public class User {
         this.id = id;
     }
 
-    public String getGithubId() { return githubId; }
-
-    public void setGithubId(String githubId) { this.githubId = githubId; }
-
-    public String getLogin() {
-        return login;
+    public String getGithubId() {
+        return githubId;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setGithubId(String githubId) {
+        this.githubId = githubId;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public String getName() {
@@ -43,5 +51,15 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", githubId='" + githubId + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

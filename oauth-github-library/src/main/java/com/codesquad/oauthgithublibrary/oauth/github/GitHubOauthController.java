@@ -3,8 +3,10 @@ package com.codesquad.oauthgithublibrary.oauth.github;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.websocket.server.PathParam;
@@ -25,14 +27,14 @@ public class GitHubOauthController {
         gitHubOauthService.login(code, response);
     }
 
-    @GetMapping("/callAPI")
-    public void callAPI(HttpServletResponse response) throws NullPointerException {
-        gitHubOauthService.callAPI(response);
-    }
+//    @GetMapping("/callAPI")
+//    public void callAPI(HttpServletResponse response, String accessToken) throws NullPointerException {
+//        gitHubOauthService.callAPI(response, accessToken);
+//    }
 
-    @GetMapping("/logined")
-    public void profile(HttpServletResponse response) throws IOException {
-        gitHubOauthService.profile(response);
-    }
+//    @GetMapping("/logined")
+//    public void profile(HttpServletResponse response) throws IOException {
+//        gitHubOauthService.profile(response);
+//    }
 
 }

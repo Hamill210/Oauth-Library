@@ -17,17 +17,17 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 @Service
 public class GitHubOauthServiceImpl implements GitHubOauthService {
 
     private static final Logger logger = LoggerFactory.getLogger(GitHubOauthController.class);
-
+    private static final String url = "http://localhost:8080";
     private final TokenRepository tokenRepository;
 
     private final String URL = "https://github.com/login/oauth/access_token";
@@ -63,53 +63,55 @@ public class GitHubOauthServiceImpl implements GitHubOauthService {
     public void login(String authorizationCode, HttpServletResponse response) throws IOException {
         GitHubTokenInfo gitHubTokenInfo = getAccessToken(authorizationCode);
         response.setHeader("Authorization", gitHubTokenInfo.getAuthorization());
-        response.sendRedirect("http://localhost:8080/callAPI");
 
         Token token = new Token(gitHubTokenInfo.getTokenType(), gitHubTokenInfo.getAccessToken());
         tokenRepository.insertToken(token);
+
+        this.getUserData(response, token.getToken());
+
     }
 
-    @Transactional
-    @Override
-    public void callAPI(HttpServletResponse response) {
-//        Token token = tokenRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("토큰이 존재하지 않습니다!"));
-//        String jsonInString = "오류입니다";
-//
-//        try {
-//            RestTemplate restTemplate = new RestTemplate();
-//
-//            HttpHeaders header = new HttpHeaders();
-//            HttpEntity<?> entity = new HttpEntity<>(header);
-//
-//            String url = "https://api.github.com/user";
-//            UriComponents uri = UriComponentsBuilder.fromHttpUrl(url + "?access_token=" + token.getToken()).build();
-//
-//            // 이 한줄의 코드로 API를 호출해 MAP 타입으로 전달 받는다
-//            ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
-//
-//            User user = new User(
-//                    1L,
-//                    resultMap.getBody().get("id").toString(),
-//                    resultMap.getBody().get("login").toString(),
-//                    resultMap.getBody().get("name").toString());
-//            userRepository.save(user);
-//            tokenRepository.delete(token);
-//
-//            response.sendRedirect("http://localhost:8080/logined");
-//
-//        } catch (HttpClientErrorException | HttpServerErrorException e) {
-//            log.info("##### HttpErrorException: {}", e.getMessage());
-//        } catch (Exception e) {
-//            log.info("##### Exception: {}", e.getMessage());
-//        }
+    public void getUserData(HttpServletResponse response, String accessToken) {
+        Token token = tokenRepository.findTokenObjectByAccessToken(accessToken);
+        logger.info("##### token1 : {}", token.getToken());
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            logger.info("##### token2 : {}", token.getToken());
+
+            HttpHeaders header = new HttpHeaders();
+            logger.info("##### token 3: {}", token.getToken());
+            HttpEntity<?> entity = new HttpEntity<>(header);
+            logger.info("##### token 4: {}", token.getToken());
+
+            String githubOfficialUrl = "https://api.github.com/user";
+            logger.info("##### token 5: {}", token.getToken());
+            UriComponents sendAceessTokenUrl = UriComponentsBuilder.fromHttpUrl(githubOfficialUrl + "?access_token=" + token.getToken()).build();
+            logger.info("##### token 6: {}", token.getToken());
+
+            // 이 한줄의 코드로 API를 호출해 MAP 타입으로 전달 받는다
+            ResponseEntity<Map> resultMap = restTemplate.exchange(sendAceessTokenUrl.toString(), HttpMethod.GET, entity, Map.class);
+            logger.info("##### token 7: {}", token.getToken());
+
+
+            User user = new User(
+                    null,
+                    resultMap.getBody().get("id").toString(),
+                    resultMap.getBody().get("login").toString(),
+                    resultMap.getBody().get("name").toString());
+
+            logger.info("##### token 8: {}", token.getToken());
+            this.sendUserCookies(user, response);
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            logger.info("##### HttpErrorException: {}", e.getMessage());
+        } catch (Exception e) {
+            logger.info("##### Exception: {}", e.getMessage());
+        }
     }
 
-    @Override
-    public void profile(HttpServletResponse response) throws IOException {
-//        User user = userRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("회원정보가 존재하지 않습니다!"));
-//        Cookie cookie = new Cookie("user",user.getLogin());
-//        response.addCookie(cookie);
-//        userRepository.delete(user);
-//        response.sendRedirect("http://localhost:8080");
+    public void sendUserCookies(User user, HttpServletResponse response) throws IOException {
+        Cookie cookie = new Cookie("user", user.getName());
+        logger.info("cookie : {}", cookie);
+        response.addCookie(cookie);
+        response.sendRedirect(url);
     }
 }

@@ -27,11 +27,6 @@ public class TokenRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-//    public Token findById() {
-//        String sql = "SELECT * FROM token WHERE id = ?";
-//        Token token = jdbcTemplate.query()
-//    }
-
     public void insertToken(Token token) {
         String sql = "INSERT INTO token (token_type, token) VALUES (:token_type, :token)";
         SqlParameterSource namedParameters = new MapSqlParameterSource()
@@ -40,4 +35,22 @@ public class TokenRepository {
                 .addValue("token", token.getToken());
         namedParameterJdbcTemplate.update(sql, namedParameters);
     }
+
+    public Token findTokenObjectByAccessToken(String accessToken) {
+        String sql = "SELECT * FROM token t WHERE t.token = ?";
+        return jdbcTemplate.query(sql, new ResultSetExtractor<Token>() {
+            @Override
+            public Token extractData(ResultSet rs) throws SQLException, DataAccessException {
+                Token token = new Token();
+                while (rs.next()) {
+                    token.setId(rs.getLong("id"));
+                    token.setTokenType(rs.getString("token_type"));
+                    token.setToken(rs.getString("token"));
+                }
+                return token;
+            }
+        }, accessToken);
+    }
+
+
 }
