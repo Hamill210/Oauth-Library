@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.websocket.server.PathParam;
@@ -21,8 +22,8 @@ public class GitHubOauthController {
     }
 
     @GetMapping("/login")
-    public void login(@PathParam("code") @Valid String code, HttpServletResponse response) throws IOException {
+    public void login(@PathParam("code") @Valid String code, HttpServletRequest request, HttpServletResponse response) throws IOException {
         log.info("##### githubLogin: {}", code);
-        gitHubOauthService.login(code, response);
+        gitHubOauthService.login(code, request, response);
     }
 }
