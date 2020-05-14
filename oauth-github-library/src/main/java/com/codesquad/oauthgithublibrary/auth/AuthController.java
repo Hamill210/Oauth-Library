@@ -15,7 +15,7 @@ public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     // replace with Github login
-    @PostMapping("/login")
+    @PostMapping("/login/oauth")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthCredential authCredential, HttpSession session) {
         if ("codesquad".equals(authCredential.getCredential())) {
             return ResponseEntity.ok(new AuthResponse(true));
