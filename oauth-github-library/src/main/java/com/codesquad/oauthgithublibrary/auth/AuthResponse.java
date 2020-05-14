@@ -5,7 +5,7 @@ public class AuthResponse {
     boolean authorizationSuccessful;
 
     public AuthResponse() {
-        
+
     }
 
     public AuthResponse(boolean authorizationSuccessful) {

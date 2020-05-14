@@ -17,12 +17,9 @@ public class AuthController {
     // replace with Github login
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthCredential authCredential, HttpSession session) {
-        logger.info("authCredential1 : {}", authCredential);
         if ("codesquad".equals(authCredential.getCredential())) {
-            logger.info("authCredential2 : {}", authCredential);
             return ResponseEntity.ok(new AuthResponse(true));
         } else {
-            logger.info("authCredential3 : {}", authCredential);
             session.invalidate();
             return ResponseEntity.ok(new AuthResponse(false));
         }

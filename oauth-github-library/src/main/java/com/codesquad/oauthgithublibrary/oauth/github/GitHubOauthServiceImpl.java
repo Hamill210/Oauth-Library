@@ -29,7 +29,6 @@ import java.util.*;
 public class GitHubOauthServiceImpl implements GitHubOauthService {
 
     private static final Logger logger = LoggerFactory.getLogger(GitHubOauthController.class);
-    private static final String url = "http://localhost:8080";
     private final TokenRepository tokenRepository;
 
     private final String URL = "https://github.com/login/oauth/access_token";
@@ -93,7 +92,8 @@ public class GitHubOauthServiceImpl implements GitHubOauthService {
                     resultMap.getBody().get("login").toString(),
                     resultMap.getBody().get("name").toString());
 
-            this.sendUserCookies(user, request, response);
+            this.sendUserCookies(user, "http://localhost:8080", request, response);
+
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             logger.info("##### HttpErrorException: {}", e.getMessage());
         } catch (Exception e) {
@@ -101,7 +101,7 @@ public class GitHubOauthServiceImpl implements GitHubOauthService {
         }
     }
 
-    public void sendUserCookies(User user, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void sendUserCookies(User user, String url, HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession(true);
         session.setAttribute("user", user);
         response.sendRedirect(url);

@@ -13,7 +13,7 @@ import java.io.IOException;
 
 @RestController
 public class GitHubOauthController {
-    private static final Logger log = LoggerFactory.getLogger(GitHubOauthController.class);
+    private static final Logger logger = LoggerFactory.getLogger(GitHubOauthController.class);
 
     private final GitHubOauthService gitHubOauthService;
 
@@ -23,7 +23,6 @@ public class GitHubOauthController {
 
     @GetMapping("/login")
     public void login(@PathParam("code") @Valid String code, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        log.info("##### githubLogin: {}", code);
         gitHubOauthService.login(code, request, response);
     }
 }
