@@ -61,18 +61,18 @@ public class GitHubOauthServiceImpl implements GitHubOauthService {
 
     @Transactional
     @Override
-    public void login(String authorizationCode, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void login(HttpServletRequest request, HttpServletResponse response, String url, String authorizationCode) throws IOException {
         GitHubTokenInfo gitHubTokenInfo = getAccessToken(authorizationCode);
-        response.setHeader("Authorization", gitHubTokenInfo.getAuthorization());
+        logger.info("##### Access Token Type: {}, Access Token: {}",gitHubTokenInfo.getTokenType(), gitHubTokenInfo.getAccessToken());
 
         Token token = new Token(gitHubTokenInfo.getTokenType(), gitHubTokenInfo.getAccessToken());
         tokenRepository.insertToken(token);
 
-        this.getUserData(request, response, token.getToken());
+        this.getUserData(request, response, url, token.getToken());
 
     }
 
-    public void getUserData(HttpServletRequest request, HttpServletResponse response, String accessToken) {
+    public void getUserData(HttpServletRequest request, HttpServletResponse response, String url, String accessToken) {
         Token token = tokenRepository.findTokenObjectByAccessToken(accessToken);
         try {
             RestTemplate restTemplate = new RestTemplate();
@@ -92,7 +92,7 @@ public class GitHubOauthServiceImpl implements GitHubOauthService {
                     resultMap.getBody().get("login").toString(),
                     resultMap.getBody().get("name").toString());
 
-            this.sendUserCookies(user, "http://localhost:8080", request, response);
+            this.sendUserCookies(request, response, user, url);
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             logger.info("##### HttpErrorException: {}", e.getMessage());
@@ -101,7 +101,7 @@ public class GitHubOauthServiceImpl implements GitHubOauthService {
         }
     }
 
-    public void sendUserCookies(User user, String url, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void sendUserCookies(HttpServletRequest request, HttpServletResponse response, User user, String url) throws IOException {
         HttpSession session = request.getSession(true);
         session.setAttribute("user", user);
         response.sendRedirect(url);

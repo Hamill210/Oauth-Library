@@ -6,5 +6,5 @@ import java.io.IOException;
 
 public interface GitHubOauthService {
 
-    void login(String authorizationCode, HttpServletRequest request, HttpServletResponse response) throws IOException;
+    void login(HttpServletRequest request, HttpServletResponse response, String url, String authorizationCode) throws IOException;
 }

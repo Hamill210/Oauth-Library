@@ -21,8 +21,8 @@ public class GitHubOauthController {
         this.gitHubOauthService = gitHubOauthService;
     }
 
-    @GetMapping("/login")
+    @GetMapping("/login/oauth")
     public void login(@PathParam("code") @Valid String code, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        gitHubOauthService.login(code, request, response);
+        gitHubOauthService.login( request, response, "http://localhost:8080", code);
     }
 }
