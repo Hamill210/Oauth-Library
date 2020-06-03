@@ -1,8 +1,10 @@
 package com.codesquad.oauthgithublibrary.oauth.github;
 
+import com.codesquad.oauthgithublibrary.auth.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,9 +18,11 @@ public class GitHubOauthController {
     private static final Logger logger = LoggerFactory.getLogger(GitHubOauthController.class);
 
     private final GitHubOauthService gitHubOauthService;
+    private final JwtService jwtService;
 
-    public GitHubOauthController(GitHubOauthService gitHubOauthService) {
+    public GitHubOauthController(GitHubOauthService gitHubOauthService, JwtService jwtService) {
         this.gitHubOauthService = gitHubOauthService;
+        this.jwtService = jwtService;
     }
 
     @GetMapping("/login/oauth")

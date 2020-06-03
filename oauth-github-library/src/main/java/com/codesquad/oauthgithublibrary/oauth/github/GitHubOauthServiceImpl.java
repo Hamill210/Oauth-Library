@@ -1,12 +1,10 @@
 package com.codesquad.oauthgithublibrary.oauth.github;
 
+import com.codesquad.oauthgithublibrary.auth.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -17,12 +15,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.servlet.*;
 import javax.servlet.http.*;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.Principal;
 import java.util.*;
 
 @Service
@@ -30,6 +24,7 @@ public class GitHubOauthServiceImpl implements GitHubOauthService {
 
     private static final Logger logger = LoggerFactory.getLogger(GitHubOauthController.class);
     private final TokenRepository tokenRepository;
+    private final JwtService jwtService;
 
     private final String URL = "https://github.com/login/oauth/access_token";
     @Value("${github.client_id}")
@@ -37,8 +32,9 @@ public class GitHubOauthServiceImpl implements GitHubOauthService {
     @Value("${github.client_secret}")
     private String clientSecret;
 
-    public GitHubOauthServiceImpl(TokenRepository tokenRepository) {
+    public GitHubOauthServiceImpl(TokenRepository tokenRepository, JwtService jwtService) {
         this.tokenRepository = tokenRepository;
+        this.jwtService = jwtService;
     }
 
     public GitHubTokenInfo getAccessToken(String code) {
@@ -92,7 +88,8 @@ public class GitHubOauthServiceImpl implements GitHubOauthService {
                     resultMap.getBody().get("login").toString(),
                     resultMap.getBody().get("name").toString());
 
-            this.sendUserCookies(request, response, user, url);
+            String jwt = jwtService.makeJwt(user.getNickname(), user.getName());
+            this.sendUserCookies(response, jwt, url);
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             logger.info("##### HttpErrorException: {}", e.getMessage());
@@ -101,9 +98,9 @@ public class GitHubOauthServiceImpl implements GitHubOauthService {
         }
     }
 
-    public void sendUserCookies(HttpServletRequest request, HttpServletResponse response, User user, String url) throws IOException {
-        HttpSession session = request.getSession(true);
-        session.setAttribute("user", user);
+    public void sendUserCookies(HttpServletResponse response, String jwt, String url) throws IOException {
+        Cookie cookie = new Cookie("token", jwt);
+        response.addCookie(cookie);
         response.sendRedirect(url);
     }
 }
