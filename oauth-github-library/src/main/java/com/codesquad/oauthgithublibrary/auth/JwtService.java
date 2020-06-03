@@ -1,18 +1,19 @@
 package com.codesquad.oauthgithublibrary.auth;
 
-import com.codesquad.oauthgithublibrary.oauth.github.User;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.spec.SecretKeySpec;
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.codesquad.oauthgithublibrary.common.CommonStaticOAuth.EXPIRE_TIME;
+
 
 @Service("jwtService")
 public class JwtService {
@@ -24,7 +25,7 @@ public class JwtService {
     public String makeJwt(String nickname, String name, String email) throws Exception {
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
         Date expireTime = new Date();
-        expireTime.setTime(expireTime.getTime() + 1000 * 60 * 1000);
+        expireTime.setTime(expireTime.getTime() + EXPIRE_TIME);
         byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(secretKey);
         Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
 
@@ -53,8 +54,9 @@ public class JwtService {
                                 .parseClaimsJws(jwt).getBody(); // 정상 수행된다면 해당 토큰은 정상토큰
 
             logger.info("expireTime :" + claims.getExpiration());
+            logger.info("nickname :" + claims.get("nickname"));
             logger.info("name :" + claims.get("name"));
-            logger.info("Email :" + claims.get("email"));
+            logger.info("email :" + claims.get("email"));
 
             return true;
         } catch (ExpiredJwtException exception) {

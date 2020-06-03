@@ -19,6 +19,8 @@ import javax.servlet.http.*;
 import java.io.IOException;
 import java.util.*;
 
+import static com.codesquad.oauthgithublibrary.common.CommonStaticOAuth.*;
+
 @Service
 public class GitHubOauthServiceImpl implements GitHubOauthService {
 
@@ -26,7 +28,7 @@ public class GitHubOauthServiceImpl implements GitHubOauthService {
     private final TokenRepository tokenRepository;
     private final JwtService jwtService;
 
-    private final String URL = "https://github.com/login/oauth/access_token";
+    private final String URL = GITHUB_ACCESS_TOKEN_URL;
     @Value("${github.client_id}")
     private String clientId;
     @Value("${github.client_secret}")
@@ -76,8 +78,8 @@ public class GitHubOauthServiceImpl implements GitHubOauthService {
             HttpHeaders header = new HttpHeaders();
             HttpEntity<?> entity = new HttpEntity<>(header);
 
-            String githubOfficialUrl = "https://api.github.com/user";
-            UriComponents sendAccessTokenUrl = UriComponentsBuilder.fromHttpUrl(githubOfficialUrl + "?access_token=" + token.getToken()).build();
+            UriComponents sendAccessTokenUrl = UriComponentsBuilder.fromHttpUrl(
+                    GITHUB_USER_INFO_ACCESS_URL + "?access_token=" + token.getToken()).build();
 
             // 이 한줄의 코드로 API를 호출해 MAP 타입으로 전달 받는다
             ResponseEntity<Map> resultMap = restTemplate.exchange(sendAccessTokenUrl.toString(), HttpMethod.GET, entity, Map.class);
