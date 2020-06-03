@@ -83,12 +83,12 @@ public class GitHubOauthServiceImpl implements GitHubOauthService {
             ResponseEntity<Map> resultMap = restTemplate.exchange(sendAccessTokenUrl.toString(), HttpMethod.GET, entity, Map.class);
 
             User user = new User(
-                    null,
-                    resultMap.getBody().get("id").toString(),
+                    Objects.requireNonNull(resultMap.getBody()).get("id").toString(),
                     resultMap.getBody().get("login").toString(),
-                    resultMap.getBody().get("name").toString());
+                    resultMap.getBody().get("name").toString(),
+                    resultMap.getBody().get("email").toString());
 
-            String jwt = jwtService.makeJwt(user.getNickname(), user.getName());
+            String jwt = jwtService.makeJwt(user.getNickname(), user.getName(), user.getEmail());
             this.sendUserCookies(response, jwt, url);
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {

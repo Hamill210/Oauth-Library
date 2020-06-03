@@ -21,7 +21,7 @@ public class JwtService {
 
     private Logger logger = LoggerFactory.getLogger(JwtService.class);
 
-    public String makeJwt(String nickname, String name) throws Exception {
+    public String makeJwt(String nickname, String name, String email) throws Exception {
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
         Date expireTime = new Date();
         expireTime.setTime(expireTime.getTime() + 1000 * 60 * 1000);
@@ -37,13 +37,13 @@ public class JwtService {
 
         map.put("nickname", nickname);
         map.put("name", name);
+        map.put("email", email);
 
         JwtBuilder builder = Jwts.builder().setHeader(headerMap)
                                  .setClaims(map)
                                  .setExpiration(expireTime)
                                  .signWith(signatureAlgorithm, signingKey);
 
-        logger.info("##### builder.compact(): {}", builder.compact());
         return builder.compact();
     }
 
